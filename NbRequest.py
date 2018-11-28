@@ -53,5 +53,4 @@ class NBPredict(Resource):
         self.count = self.count + 1
         if self.count > 5:
             self.nb = initiate_nb()
-            print("hello")
         return result, 201
