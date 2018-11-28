@@ -1,14 +1,7 @@
 import pandas as pd
 import numpy as np
 from collections import defaultdict
-import re
-
-
-def preprocess_string(str_arg):
-    cleaned_str = re.sub('[^a-z\s]+', ' ', str_arg, flags=re.IGNORECASE)
-    cleaned_str = re.sub('(\s+)', ' ', cleaned_str)
-    cleaned_str = cleaned_str.lower()
-    return cleaned_str
+from Utitilites import Utilites
 
 
 class NaiveBayes:
@@ -33,7 +26,7 @@ class NaiveBayes:
         if not isinstance(self.labels, np.ndarray): self.labels = np.array(self.labels)
         for cat_index, cat in enumerate(self.classes):
             all_cat_examples = self.examples[self.labels == cat]  # filter all examples of category == cat
-            cleaned_examples = [preprocess_string(cat_example) for cat_example in all_cat_examples]
+            cleaned_examples = [Utilites.preprocess_string(cat_example) for cat_example in all_cat_examples]
             cleaned_examples = pd.DataFrame(data=cleaned_examples)
             np.apply_along_axis(self.addToBow, 1, cleaned_examples, cat_index)
         prob_classes = np.empty(self.classes.shape[0])
@@ -72,7 +65,7 @@ class NaiveBayes:
 
         predictions = []  # to store prediction of each test example
         for example in test_set:
-            cleaned_example = preprocess_string(example)
+            cleaned_example = Utilites.preprocess_string(example)
             post_prob = self.getExampleProb(cleaned_example)
             predictions.append(self.classes[np.argmax(post_prob)])
 

@@ -1,6 +1,5 @@
 from flask_restful import Resource, reqparse
 from sklearn.model_selection import train_test_split
-import uuid
 import sqlite3
 import numpy as np
 from NaiveBayes import NaiveBayes
@@ -9,7 +8,7 @@ from NaiveBayes import NaiveBayes
 def initiate_nb():
     conn = sqlite3.connect("FakeNews.sqlite")
     c = conn.cursor()
-    c.execute("Select * from TrainingData")
+    c.execute("Select * from FakeNewsTbl")
     results = c.fetchall()
     x_train = [row[2] for row in results]
     y_train = [row[1] for row in results]
@@ -28,8 +27,8 @@ def initiate_nb():
 def addResult(result):
     conn = sqlite3.connect("FakeNews.sqlite")
     c = conn.cursor()
-    c.execute("INSERT INTO TrainingData VALUES(?, ?, ?)",
-              (str(uuid.uuid4()), result["predictionCode"], result["text"]))
+    c.execute("INSERT INTO FakeNewsTbl (class, post) VALUES(?, ?)",
+              (result["predictionCode"], result["text"]))
     conn.commit()
     conn.close()
 
@@ -44,7 +43,7 @@ class NBPredict(Resource):
         args = parser.parse_args()
         input_text = args["text"]
         prediction = self.nb.test([input_text])
-        prediction_text = "Positive" if prediction[0] == 1 else "Negative"
+        prediction_text = "Fake" if prediction[0] == 1 else "Real"
         result = {
             "predictionCode": int(prediction[0]),
             "text": input_text,
